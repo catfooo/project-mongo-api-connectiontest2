@@ -35,36 +35,18 @@ const Book = mongoose.model('Book', {
 })
 
 const seedDatabase = async () => {
-  console.log("Starting database seeding...");
+  console.log("Starting database seeding...")
+  await Book.deleteMany({})
+  console.log("Existing books deleted.")
 
-  try {
-    // Delete documents in batches of 1000
-    let offset = 0;
-    const batchSize = 1000;
+  // booksData.forEach((bookData) => {
+  //   new Book(bookData).save()
+  // })
 
-    while (true) {
-      const result = await Book.deleteMany({}).skip(offset).limit(batchSize);
-
-      if (result.deletedCount === 0) {
-        // No more documents to delete
-        break;
-      }
-
-      offset += batchSize;
-    }
-
-    console.log("Existing books deleted.");
-
-    // Insert new documents
-    await Promise.all(
-      booksData.map((bookData) => new Book(bookData).save())
-    );
-
-    console.log("Database seeded successfully");
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
-};
+  await Promise.all(booksData.map(bookData => new Book(bookData).save()))
+  .then(() => console.log("Database seeded successfully"))
+  .catch(err => console.error("Error seeding database:", err))
+}
 
 
 if (process.env.RESET_DATABASE == 'true') {
